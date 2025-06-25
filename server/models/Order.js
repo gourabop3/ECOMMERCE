@@ -22,17 +22,19 @@ const OrderSchema = new mongoose.Schema({
   },
   orderStatus: {
     type: String,
-    default: "pending", // ✅ default added
+    enum: ["pending", "inProcess", "inShipping", "delivered", "rejected"],
+    default: "pending", // ✅ default + enum added
   },
   paymentMethod: String,
   paymentStatus: {
     type: String,
-    default: "pending", // ✅ default added
+    enum: ["pending", "paid"], // ✅ enum added
+    default: "pending",
   },
   totalAmount: Number,
   orderDate: {
     type: Date,
-    default: Date.now, // ✅ optional
+    default: Date.now,
   },
   orderUpdateDate: Date,
   paymentId: String,
