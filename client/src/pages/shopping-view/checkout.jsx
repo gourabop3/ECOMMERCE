@@ -14,10 +14,9 @@ function ShoppingCheckout() {
   const { approvalURL } = useSelector((state) => state.shopOrder);
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
   const [isPaymentStart, setIsPaymemntStart] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("paypal");
   const dispatch = useDispatch();
   const { toast } = useToast();
-
-  console.log(currentSelectedAddress, "cartItems");
 
   const totalCartAmount =
     cartItems && cartItems.items && cartItems.items.length > 0
@@ -38,23 +37,14 @@ function ShoppingCheckout() {
         title: "Your cart is empty. Please add items to proceed",
         variant: "destructive",
       });
-
       return;
     }
+
     if (currentSelectedAddress === null) {
-      
-<div className="flex flex-col gap-3 mt-4">
-  <label className="font-semibold">Select Payment Method:</label>
-  <label><input type="radio" name="paymentMethod" value="COD" onChange={() => setPaymentMethod("COD")} /> Cash on Delivery (COD)</label>
-  <label><input type="radio" name="paymentMethod" value="UPI" onChange={() => setPaymentMethod("UPI")} /> UPI (9733996528-7@ybl)</label>
-</div>
-
-
-toast({
+      toast({
         title: "Please select one address to proceed.",
         variant: "destructive",
       });
-
       return;
     }
 
@@ -81,7 +71,6 @@ toast({
         notes: currentSelectedAddress?.notes,
       },
       orderStatus: "pending",
-      paymentMethod: "paypal",
       paymentStatus: "pending",
       totalAmount: totalCartAmount,
       orderDate: new Date(),
@@ -91,11 +80,12 @@ toast({
     };
 
     dispatch(createNewOrder(orderData)).then((data) => {
-      console.log(data, "gourab");
-      if (data?.payload?.success) {
+      if (data?.payload?.success && paymentMethod === "paypal") {
         setIsPaymemntStart(true);
       } else {
-        setIsPaymemntStart(false);
+        toast({
+          title: "Order placed with " + paymentMethod,
+        });
       }
     });
   }
@@ -117,9 +107,48 @@ toast({
         <div className="flex flex-col gap-4">
           {cartItems && cartItems.items && cartItems.items.length > 0
             ? cartItems.items.map((item) => (
-                <UserCartItemsContent cartItem={item} />
+                <UserCartItemsContent key={item._id} cartItem={item} />
               ))
             : null}
+
+          <div className="mt-4">
+            <label className="font-semibold mb-2 block">
+              Select Payment Method:
+            </label>
+            <div className="flex flex-col gap-2">
+              <label>
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="paypal"
+                  checked={paymentMethod === "paypal"}
+                  onChange={() => setPaymentMethod("paypal")}
+                />{" "}
+                PayPal
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="UPI"
+                  checked={paymentMethod === "UPI"}
+                  onChange={() => setPaymentMethod("UPI")}
+                />{" "}
+                UPI (9733996528-7@ybl)
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="COD"
+                  checked={paymentMethod === "COD"}
+                  onChange={() => setPaymentMethod("COD")}
+                />{" "}
+                Cash on Delivery
+              </label>
+            </div>
+          </div>
+
           <div className="mt-8 space-y-4">
             <div className="flex justify-between">
               <span className="font-bold">Total</span>
@@ -130,7 +159,7 @@ toast({
             <Button onClick={handleInitiatePaypalPayment} className="w-full">
               {isPaymentStart
                 ? "Processing Paypal Payment..."
-                : "Checkout with Paypal"}
+                : `Checkout with ${paymentMethod}`}
             </Button>
           </div>
         </div>
