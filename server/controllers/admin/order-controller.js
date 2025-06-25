@@ -29,7 +29,6 @@ const getAllOrdersOfAllUsers = async (req, res) => {
 const getOrderDetailsForAdmin = async (req, res) => {
   try {
     const { id } = req.params;
-
     const order = await Order.findById(id);
 
     if (!order) {
@@ -52,7 +51,7 @@ const getOrderDetailsForAdmin = async (req, res) => {
   }
 };
 
-// ✅ Update order status (pending → delivered, etc.)
+// ✅ Update order status
 const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -67,7 +66,8 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
-    await Order.findByIdAndUpdate(id, { orderStatus });
+    order.orderStatus = orderStatus;
+    await order.save();
 
     res.status(200).json({
       success: true,
@@ -82,7 +82,7 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
-// ✅ NEW: Update payment status (pending → paid)
+// ✅ Fixed: Update payment status (preserve orderStatus)
 const updatePaymentStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -95,6 +95,11 @@ const updatePaymentStatus = async (req, res) => {
         success: false,
         message: "Order not found!",
       });
+    }
+
+    // 🔧 Prevent orderStatus from going empty if undefined
+    if (!order.orderStatus) {
+      order.orderStatus = "pending"; // fallback value
     }
 
     order.paymentStatus = paymentStatus;
@@ -117,5 +122,5 @@ module.exports = {
   getAllOrdersOfAllUsers,
   getOrderDetailsForAdmin,
   updateOrderStatus,
-  updatePaymentStatus, // ✅ Don't forget to export this
+  updatePaymentStatus,
 };
