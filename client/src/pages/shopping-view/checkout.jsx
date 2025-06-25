@@ -134,7 +134,7 @@ function ShoppingCheckout() {
                   checked={paymentMethod === "UPI"}
                   onChange={() => setPaymentMethod("UPI")}
                 />{" "}
-                UPI (9733996528-7@ybl)
+                UPI 
               </label>
               <label>
                 <input
@@ -163,7 +163,7 @@ function ShoppingCheckout() {
                 : paymentMethod === "COD"
                 ? "Checkout with COD"
                 : paymentMethod === "UPI"
-                ? "Pay with UPI (9733996528-7@ybl)"
+                ? "Pay with UPI"
                 : "Checkout with PayPal"}
             </Button>
           </div>
