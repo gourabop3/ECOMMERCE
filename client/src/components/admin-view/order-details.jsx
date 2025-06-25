@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CommonForm from "../common/form";
 import { DialogContent } from "../ui/dialog";
 import { Label } from "../ui/label";
@@ -9,7 +9,7 @@ import {
   getAllOrdersForAdmin,
   getOrderDetailsForAdmin,
   updateOrderStatus,
-  updatePaymentStatus, // ✅ added
+  updatePaymentStatus,
 } from "@/store/admin/order-slice";
 import { useToast } from "../ui/use-toast";
 
@@ -17,40 +17,44 @@ const initialFormData = {
   status: "",
 };
 
-function AdminOrderDetailsView({ orderDetails }) {
-  const [formData, setFormData] = useState(initialFormData);
-  const { user } = useSelector((state) => state.auth);
+function AdminOrderDetailsView({ orderId }) {
   const dispatch = useDispatch();
+  const { orderDetails } = useSelector((state) => state.adminOrder);
+  const { user } = useSelector((state) => state.auth);
   const { toast } = useToast();
+
+  const [formData, setFormData] = useState(initialFormData);
+
+  useEffect(() => {
+    if (orderId) {
+      dispatch(getOrderDetailsForAdmin(orderId));
+    }
+  }, [orderId, dispatch]);
+
+  if (!orderDetails) return <div className="p-4 text-sm">Loading...</div>;
 
   function handleUpdateStatus(event) {
     event.preventDefault();
     const { status } = formData;
 
-    dispatch(
-      updateOrderStatus({ id: orderDetails?._id, orderStatus: status })
-    ).then((data) => {
+    dispatch(updateOrderStatus({ id: orderDetails._id, orderStatus: status })).then((data) => {
       if (data?.payload?.success) {
-        dispatch(getOrderDetailsForAdmin(orderDetails?._id));
+        dispatch(getOrderDetailsForAdmin(orderDetails._id));
         dispatch(getAllOrdersForAdmin());
         setFormData(initialFormData);
-        toast({
-          title: data?.payload?.message,
-        });
+        toast({ title: data.payload.message });
       }
     });
   }
 
   function handleMarkAsPaid(orderId) {
-    dispatch(updatePaymentStatus({ id: orderId, paymentStatus: "paid" })).then(
-      (data) => {
-        if (data?.payload?.success) {
-          toast({ title: "✅ Payment marked as paid" });
-          dispatch(getOrderDetailsForAdmin(orderId));
-          dispatch(getAllOrdersForAdmin());
-        }
+    dispatch(updatePaymentStatus({ id: orderId, paymentStatus: "paid" })).then((data) => {
+      if (data?.payload?.success) {
+        toast({ title: "✅ Payment marked as paid" });
+        dispatch(getOrderDetailsForAdmin(orderId));
+        dispatch(getAllOrdersForAdmin());
       }
-    );
+    });
   }
 
   return (
@@ -73,7 +77,6 @@ function AdminOrderDetailsView({ orderDetails }) {
             <p className="font-medium">Payment:</p>
             <Label>{orderDetails?.paymentMethod}</Label>
           </div>
-
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="font-medium">Payment Status:</p>
             <div className="flex items-center gap-2">
@@ -88,7 +91,6 @@ function AdminOrderDetailsView({ orderDetails }) {
               )}
             </div>
           </div>
-
           <div className="flex items-center justify-between">
             <p className="font-medium">Order Status:</p>
             <Badge
