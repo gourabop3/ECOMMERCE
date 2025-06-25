@@ -32,8 +32,6 @@ function AdminOrdersView() {
     dispatch(getAllOrdersForAdmin());
   }, [dispatch]);
 
-  console.log(orderDetails, "orderList");
-
   useEffect(() => {
     if (orderDetails !== null) setOpenDetailsDialog(true);
   }, [orderDetails]);
@@ -44,27 +42,32 @@ function AdminOrdersView() {
         <CardTitle>All Orders</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Order ID</TableHead>
-              <TableHead>Order Date</TableHead>
-              <TableHead>Order Status</TableHead>
-              <TableHead>Order Price</TableHead>
-              <TableHead>
-                <span className="sr-only">Details</span>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {orderList && orderList.length > 0
-              ? orderList.map((orderItem) => (
-                  <TableRow>
-                    <TableCell>{orderItem?._id}</TableCell>
-                    <TableCell>{orderItem?.orderDate.split("T")[0]}</TableCell>
+        <div className="w-full overflow-x-auto">
+          <Table className="min-w-[700px]">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Order ID</TableHead>
+                <TableHead>Order Date</TableHead>
+                <TableHead>Order Status</TableHead>
+                <TableHead>Order Price</TableHead>
+                <TableHead>
+                  <span className="sr-only">Details</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {orderList && orderList.length > 0 ? (
+                orderList.map((orderItem) => (
+                  <TableRow key={orderItem?._id}>
+                    <TableCell className="max-w-[140px] truncate">
+                      {orderItem?._id}
+                    </TableCell>
+                    <TableCell>
+                      {orderItem?.orderDate?.split("T")[0]}
+                    </TableCell>
                     <TableCell>
                       <Badge
-                        className={`py-1 px-3 ${
+                        className={`py-0.5 px-2 text-xs ${
                           orderItem?.orderStatus === "confirmed"
                             ? "bg-green-500"
                             : orderItem?.orderStatus === "rejected"
@@ -75,7 +78,7 @@ function AdminOrdersView() {
                         {orderItem?.orderStatus}
                       </Badge>
                     </TableCell>
-                    <TableCell>${orderItem?.totalAmount}</TableCell>
+                    <TableCell>₹{orderItem?.totalAmount}</TableCell>
                     <TableCell>
                       <Dialog
                         open={openDetailsDialog}
@@ -85,20 +88,26 @@ function AdminOrdersView() {
                         }}
                       >
                         <Button
-                          onClick={() =>
-                            handleFetchOrderDetails(orderItem?._id)
-                          }
+                          className="px-3 py-1 text-sm"
+                          onClick={() => handleFetchOrderDetails(orderItem?._id)}
                         >
-                          View Details
+                          View
                         </Button>
                         <AdminOrderDetailsView orderDetails={orderDetails} />
                       </Dialog>
                     </TableCell>
                   </TableRow>
                 ))
-              : null}
-          </TableBody>
-        </Table>
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center">
+                    No orders found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );
