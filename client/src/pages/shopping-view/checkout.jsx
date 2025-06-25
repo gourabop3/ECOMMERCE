@@ -5,7 +5,6 @@ import UserCartItemsContent from "@/components/shopping-view/cart-items-content"
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { createNewOrder } from "@/store/shop/order-slice";
-import { Navigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 
 function ShoppingCheckout() {
@@ -13,54 +12,56 @@ function ShoppingCheckout() {
   const { user } = useSelector((state) => state.auth);
   const { approvalURL } = useSelector((state) => state.shopOrder);
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
-  const [isPaymentStart, setIsPaymemntStart] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("paypal");
+  const [isPaymentStart, setIsPaymemntStart] = useState(false);
   const dispatch = useDispatch();
   const { toast } = useToast();
 
   const totalCartAmount =
-    cartItems && cartItems.items && cartItems.items.length > 0
+    cartItems?.items?.length > 0
       ? cartItems.items.reduce(
-          (sum, currentItem) =>
+          (sum, item) =>
             sum +
-            (currentItem?.salePrice > 0
-              ? currentItem?.salePrice
-              : currentItem?.price) *
-              currentItem?.quantity,
+            (item?.salePrice > 0 ? item.salePrice : item.price) *
+              item.quantity,
           0
         )
       : 0;
 
-  function handleInitiatePaypalPayment() {
-    if (cartItems.length === 0) {
+  function handlePlaceOrder() {
+    if (!currentSelectedAddress) {
       toast({
-        title: "Your cart is empty. Please add items to proceed",
+        title: "Please select an address",
         variant: "destructive",
       });
       return;
     }
 
-    if (currentSelectedAddress === null) {
+    if (cartItems?.items?.length === 0) {
       toast({
-        title: "Please select one address to proceed.",
+        title: "Cart is empty",
         variant: "destructive",
       });
       return;
+    }
+
+    if (paymentMethod === "UPI") {
+      const confirmed = window.confirm(
+        `Please pay ₹${totalCartAmount} to UPI ID:\n9733996528-7@ybl\n\nAfter payment, click OK to place your order.`
+      );
+      if (!confirmed) return;
     }
 
     const orderData = {
       paymentMethod,
       userId: user?.id,
       cartId: cartItems?._id,
-      cartItems: cartItems.items.map((singleCartItem) => ({
-        productId: singleCartItem?.productId,
-        title: singleCartItem?.title,
-        image: singleCartItem?.image,
-        price:
-          singleCartItem?.salePrice > 0
-            ? singleCartItem?.salePrice
-            : singleCartItem?.price,
-        quantity: singleCartItem?.quantity,
+      cartItems: cartItems.items.map((item) => ({
+        productId: item?.productId,
+        title: item?.title,
+        image: item?.image,
+        price: item?.salePrice > 0 ? item.salePrice : item.price,
+        quantity: item?.quantity,
       })),
       addressInfo: {
         addressId: currentSelectedAddress?._id,
@@ -82,10 +83,12 @@ function ShoppingCheckout() {
     dispatch(createNewOrder(orderData)).then((data) => {
       if (data?.payload?.success && paymentMethod === "paypal") {
         setIsPaymemntStart(true);
+      } else if (data?.payload?.success) {
+        toast({ title: `Order placed successfully with ${paymentMethod}` });
+        dispatch({ type: "shopCart/clearCart" });
+        window.location.href = "/my-orders";
       } else {
-        toast({
-          title: "Order placed with " + paymentMethod,
-        });
+        setIsPaymemntStart(false);
       }
     });
   }
@@ -105,17 +108,14 @@ function ShoppingCheckout() {
           setCurrentSelectedAddress={setCurrentSelectedAddress}
         />
         <div className="flex flex-col gap-4">
-          {cartItems && cartItems.items && cartItems.items.length > 0
-            ? cartItems.items.map((item) => (
-                <UserCartItemsContent key={item._id} cartItem={item} />
-              ))
-            : null}
+          {cartItems?.items?.length > 0 &&
+            cartItems.items.map((item) => (
+              <UserCartItemsContent cartItem={item} />
+            ))}
 
           <div className="mt-4">
-            <label className="font-semibold mb-2 block">
-              Select Payment Method:
-            </label>
-            <div className="flex flex-col gap-2">
+            <label className="font-semibold">Select Payment Method:</label>
+            <div className="flex flex-col gap-2 mt-2">
               <label>
                 <input
                   type="radio"
@@ -155,11 +155,16 @@ function ShoppingCheckout() {
               <span className="font-bold">₹{totalCartAmount}</span>
             </div>
           </div>
+
           <div className="mt-4 w-full">
-            <Button onClick={handleInitiatePaypalPayment} className="w-full">
-              {isPaymentStart
-                ? "Processing Paypal Payment..."
-                : `Checkout with ${paymentMethod}`}
+            <Button onClick={handlePlaceOrder} className="w-full">
+              {isPaymentStart && paymentMethod === "paypal"
+                ? "Redirecting to PayPal..."
+                : paymentMethod === "COD"
+                ? "Checkout with COD"
+                : paymentMethod === "UPI"
+                ? "Pay with UPI (9733996528-7@ybl)"
+                : "Checkout with PayPal"}
             </Button>
           </div>
         </div>
