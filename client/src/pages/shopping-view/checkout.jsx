@@ -14,6 +14,7 @@ function ShoppingCheckout() {
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("paypal");
   const [isPaymentStart, setIsPaymemntStart] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
   const dispatch = useDispatch();
   const { toast } = useToast();
 
@@ -28,30 +29,9 @@ function ShoppingCheckout() {
         )
       : 0;
 
-  function handlePlaceOrder() {
-    if (!currentSelectedAddress) {
-      toast({
-        title: "Please select an address",
-        variant: "destructive",
-      });
-      return;
-    }
+  const upiQRURL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9733996528-7@ybl&pn=YourShop&am=${totalCartAmount}&cu=INR`;
 
-    if (cartItems?.items?.length === 0) {
-      toast({
-        title: "Cart is empty",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (paymentMethod === "UPI") {
-      const confirmed = window.confirm(
-        `Please pay ₹${totalCartAmount} to UPI ID:\n9733996528-7@ybl\n\nAfter payment, click OK to place your order.`
-      );
-      if (!confirmed) return;
-    }
-
+  function placeFinalOrder() {
     const orderData = {
       paymentMethod,
       userId: user?.id,
@@ -93,12 +73,59 @@ function ShoppingCheckout() {
     });
   }
 
+  function handlePlaceOrder() {
+    if (!currentSelectedAddress) {
+      toast({
+        title: "Please select an address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (cartItems?.items?.length === 0) {
+      toast({
+        title: "Cart is empty",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (paymentMethod === "UPI") {
+      setShowQRModal(true);
+      return;
+    }
+
+    placeFinalOrder();
+  }
+
   if (approvalURL) {
     window.location.href = approvalURL;
   }
 
   return (
     <div className="flex flex-col">
+      {/* UPI QR Modal */}
+      {showQRModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg text-center max-w-sm w-full">
+            <h2 className="text-lg font-semibold mb-4">Scan & Pay ₹{totalCartAmount}</h2>
+            <img src={upiQRURL} alt="UPI QR" className="mx-auto mb-4" />
+            <p className="text-sm text-gray-600 mb-4">
+              UPI ID: <strong>9733996528-7@ybl</strong>
+            </p>
+            <Button onClick={() => {
+              setShowQRModal(false);
+              placeFinalOrder();
+            }} className="w-full">
+              I’ve Paid – Place Order
+            </Button>
+            <button onClick={() => setShowQRModal(false)} className="text-sm text-gray-500 mt-2">
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="relative h-[300px] w-full overflow-hidden">
         <img src={img} className="h-full w-full object-cover object-center" />
       </div>
@@ -109,8 +136,8 @@ function ShoppingCheckout() {
         />
         <div className="flex flex-col gap-4">
           {cartItems?.items?.length > 0 &&
-            cartItems.items.map((item) => (
-              <UserCartItemsContent cartItem={item} />
+            cartItems.items.map((item, idx) => (
+              <UserCartItemsContent key={idx} cartItem={item} />
             ))}
 
           <div className="mt-4">
@@ -134,7 +161,7 @@ function ShoppingCheckout() {
                   checked={paymentMethod === "UPI"}
                   onChange={() => setPaymentMethod("UPI")}
                 />{" "}
-                UPI 
+                UPI
               </label>
               <label>
                 <input
