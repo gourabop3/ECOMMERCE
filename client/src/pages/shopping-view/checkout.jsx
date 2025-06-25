@@ -29,7 +29,10 @@ function ShoppingCheckout() {
         )
       : 0;
 
-  const upiQRURL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9733996528-7@ybl&pn=YourShop&am=${totalCartAmount}&cu=INR`;
+  const upiString = `upi://pay?pa=9733996528-7@ybl&pn=GOURAB&am=${totalCartAmount}&cu=INR`;
+  const upiQRURL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+    upiString
+  )}`;
 
   function placeFinalOrder() {
     const orderData = {
@@ -104,22 +107,35 @@ function ShoppingCheckout() {
 
   return (
     <div className="flex flex-col">
-      {/* UPI QR Modal */}
+      {/* QR Code Modal */}
       {showQRModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded shadow-lg text-center max-w-sm w-full">
-            <h2 className="text-lg font-semibold mb-4">Scan & Pay ₹{totalCartAmount}</h2>
-            <img src={upiQRURL} alt="UPI QR" className="mx-auto mb-4" />
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg p-6 text-center w-[90%] max-w-sm">
+            <h2 className="text-lg font-semibold mb-2">
+              Scan & Pay ₹{totalCartAmount}
+            </h2>
+            <img
+              src={upiQRURL}
+              alt="UPI QR"
+              key={totalCartAmount}
+              className="mx-auto mb-3"
+            />
             <p className="text-sm text-gray-600 mb-4">
               UPI ID: <strong>9733996528-7@ybl</strong>
             </p>
-            <Button onClick={() => {
-              setShowQRModal(false);
-              placeFinalOrder();
-            }} className="w-full">
+            <Button
+              onClick={() => {
+                setShowQRModal(false);
+                placeFinalOrder();
+              }}
+              className="w-full"
+            >
               I’ve Paid – Place Order
             </Button>
-            <button onClick={() => setShowQRModal(false)} className="text-sm text-gray-500 mt-2">
+            <button
+              onClick={() => setShowQRModal(false)}
+              className="mt-2 text-xs text-gray-400"
+            >
               Cancel
             </button>
           </div>
