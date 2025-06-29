@@ -68,8 +68,8 @@ function ShoppingCheckout() {
         setIsPaymemntStart(true);
       } else if (data?.payload?.success) {
         toast({ title: `Order placed successfully with ${paymentMethod}` });
-        dispatch({ type: "shopCart/clearCart" });
-        window.location.href = "/my-orders";
+dispatch({ type: "shopCart/clearCart" });
+window.location.href = "/shop/payment-success";
       } else {
         setIsPaymemntStart(false);
       }
