@@ -23,6 +23,7 @@ import UserCartWrapper from "./cart-wrapper";
 import { useEffect, useState } from "react";
 import { fetchCartItems } from "@/store/shop/cart-slice";
 import { Label } from "../ui/label";
+import { Input } from "../ui/input";
 
 function MenuItems() {
   const navigate = useNavigate();
@@ -61,6 +62,27 @@ function MenuItems() {
         </Label>
       ))}
     </nav>
+  );
+}
+
+function SearchBox() {
+  const [keyword, setKeyword] = useState("");
+  const navigate = useNavigate();
+
+  function handleKeyDown(event) {
+    if (event.key === "Enter" && keyword.trim().length > 0) {
+      navigate(`/shop/search?keyword=${keyword.trim()}`);
+    }
+  }
+
+  return (
+    <Input
+      value={keyword}
+      onChange={(e) => setKeyword(e.target.value)}
+      onKeyDown={handleKeyDown}
+      placeholder="Search products…"
+      className="w-full lg:w-96 py-2"
+    />
   );
 }
 
@@ -153,10 +175,16 @@ function ShoppingHeader() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-full max-w-xs">
+            <div className="mb-4">
+              <SearchBox />
+            </div>
             <MenuItems />
             <HeaderRightContent />
           </SheetContent>
         </Sheet>
+        <div className="hidden lg:flex flex-1 justify-center px-6">
+          <SearchBox />
+        </div>
         <div className="hidden lg:block">
           <MenuItems />
         </div>
