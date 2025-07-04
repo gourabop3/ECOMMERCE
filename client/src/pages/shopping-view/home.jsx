@@ -4,18 +4,16 @@ import bannerTwo from "../../assets/banner-2.webp";
 import bannerThree from "../../assets/banner-3.webp";
 import {
   Airplay,
-  BabyIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   CloudLightning,
-  Heater,
-  Images,
-  Shirt,
-  ShirtIcon,
-  ShoppingBasket,
-  UmbrellaIcon,
-  WashingMachine,
   WatchIcon,
+  Smartphone,
+  Laptop,
+  Headphones,
+  Plug,
+  Camera,
+  Apple,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -32,20 +30,19 @@ import ProductDetailsDialog from "@/components/shopping-view/product-details";
 import { getFeatureImages } from "@/store/common-slice";
 
 const categoriesWithIcon = [
-  { id: "men", label: "Men", icon: ShirtIcon },
-  { id: "women", label: "Women", icon: CloudLightning },
-  { id: "kids", label: "Kids", icon: BabyIcon },
-  { id: "accessories", label: "Accessories", icon: WatchIcon },
-  { id: "footwear", label: "Footwear", icon: UmbrellaIcon },
+  { id: "mobiles", label: "Mobiles", icon: Smartphone },
+  { id: "laptops", label: "Laptops", icon: Laptop },
+  { id: "audio", label: "Audio", icon: Headphones },
+  { id: "accessories", label: "Accessories", icon: Plug },
+  { id: "cameras", label: "Cameras", icon: Camera },
 ];
 
 const brandsWithIcon = [
-  { id: "nike", label: "Nike", icon: Shirt },
-  { id: "adidas", label: "Adidas", icon: WashingMachine },
-  { id: "puma", label: "Puma", icon: ShoppingBasket },
-  { id: "levi", label: "Levi's", icon: Airplay },
-  { id: "zara", label: "Zara", icon: Images },
-  { id: "h&m", label: "H&M", icon: Heater },
+  { id: "apple", label: "Apple", icon: Apple },
+  { id: "samsung", label: "Samsung", icon: WatchIcon },
+  { id: "xiaomi", label: "Xiaomi", icon: Airplay },
+  { id: "oneplus", label: "OnePlus", icon: CloudLightning },
+  { id: "sony", label: "Sony", icon: WatchIcon },
 ];
 function ShoppingHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
