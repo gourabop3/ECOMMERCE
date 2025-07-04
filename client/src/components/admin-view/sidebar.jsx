@@ -28,6 +28,18 @@ const adminSidebarMenuItems = [
     path: "/admin/orders",
     icon: <BadgeCheck />,
   },
+  {
+    id: "categories",
+    label: "Categories",
+    path: "/admin/categories",
+    icon: <BadgeCheck />,
+  },
+  {
+    id: "brands",
+    label: "Brands",
+    path: "/admin/brands",
+    icon: <BadgeCheck />,
+  },
 ];
 
 function MenuItems({ setOpen }) {
