@@ -1,4 +1,4 @@
-import { HousePlug, LogOut, Menu, ShoppingCart, UserCog } from "lucide-react";
+import { HousePlug, LogOut, Menu, ShoppingCart, UserCog, Megaphone } from "lucide-react";
 import {
   Link,
   useLocation,
@@ -24,6 +24,15 @@ import { useEffect, useState } from "react";
 import { fetchCartItems } from "@/store/shop/cart-slice";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+
+function PromoBar() {
+  return (
+    <div className="bg-primary text-primary-foreground flex items-center justify-center gap-2 text-xs py-1 px-4">
+      <Megaphone className="h-4 w-4" />
+      <span>Free shipping on orders over $50 – Use code <strong>FREE50</strong></span>
+    </div>
+  );
+}
 
 function MenuItems() {
   const navigate = useNavigate();
@@ -55,7 +64,7 @@ function MenuItems() {
       {shoppingViewHeaderMenuItems.map((menuItem) => (
         <Label
           onClick={() => handleNavigate(menuItem)}
-          className="text-sm font-medium cursor-pointer"
+          className="text-sm font-medium cursor-pointer lg:text-white lg:hover:text-white/80 transition-colors"
           key={menuItem.id}
         >
           {menuItem.label}
@@ -81,7 +90,7 @@ function SearchBox() {
       onChange={(e) => setKeyword(e.target.value)}
       onKeyDown={handleKeyDown}
       placeholder="Search products…"
-      className="w-full lg:w-96 py-2"
+      className="w-full lg:w-96 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm"
     />
   );
 }
@@ -161,27 +170,30 @@ function ShoppingHeader() {
   const { isAuthenticated } = useSelector((state) => state.auth);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background">
-      <div className="flex h-16 items-center justify-between px-4 md:px-6">
-        <Link to="/shop/home" className="flex items-center gap-2">
-          <HousePlug className="h-6 w-6" />
-          <span className="font-bold">Ecommerce</span>
-        </Link>
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="lg:hidden">
-              <Menu className="h-6 w-6" />
-              <span className="sr-only">Toggle header menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-full max-w-xs">
-            <div className="mb-4">
-              <SearchBox />
-            </div>
-            <MenuItems />
-            <HeaderRightContent />
-          </SheetContent>
-        </Sheet>
+    <div className="sticky top-0 z-50 shadow-md">
+      <PromoBar />
+      <header className="w-full bg-gradient-to-r from-[#4f46e5] to-[#06b6d4]">
+        <div className="flex h-16 items-center justify-between px-4 md:px-6">
+          <Link to="/shop/home" className="flex items-center gap-2 text-white">
+            <HousePlug className="h-6 w-6" />
+            <span className="font-bold">Ecommerce</span>
+          </Link>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="lg:hidden">
+                <Menu className="h-6 w-6" />
+                <span className="sr-only">Toggle header menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-full max-w-xs">
+              <div className="mb-4">
+                <SearchBox />
+              </div>
+              <MenuItems />
+              <HeaderRightContent />
+            </SheetContent>
+          </Sheet>
+        </div>
         <div className="hidden lg:flex flex-1 justify-center px-6">
           <SearchBox />
         </div>
@@ -192,8 +204,8 @@ function ShoppingHeader() {
         <div className="hidden lg:block">
           <HeaderRightContent />
         </div>
-      </div>
-    </header>
+      </header>
+    </div>
   );
 }
 
