@@ -4,24 +4,16 @@ import bannerTwo from "../../assets/banner-2.webp";
 import bannerThree from "../../assets/banner-3.webp";
 import {
   Airplay,
-  BabyIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   CloudLightning,
-  Heater,
-  Images,
-  Shirt,
-  ShirtIcon,
-  ShoppingBasket,
-  UmbrellaIcon,
-  WashingMachine,
   WatchIcon,
   Smartphone,
   Laptop,
   Headphones,
   Plug,
   Camera,
-  AppleIcon,
+  Apple,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -46,11 +38,11 @@ const categoriesWithIcon = [
 ];
 
 const brandsWithIcon = [
-  { id: "apple", label: "Apple", icon: AppleIcon },
+  { id: "apple", label: "Apple", icon: Apple },
   { id: "samsung", label: "Samsung", icon: WatchIcon },
   { id: "xiaomi", label: "Xiaomi", icon: Airplay },
   { id: "oneplus", label: "OnePlus", icon: CloudLightning },
-  { id: "sony", label: "Sony", icon: Images },
+  { id: "sony", label: "Sony", icon: WatchIcon },
 ];
 function ShoppingHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
