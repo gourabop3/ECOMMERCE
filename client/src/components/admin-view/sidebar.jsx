@@ -45,10 +45,10 @@ function MenuItems({ setOpen }) {
               navigate(menuItem.path);
               setOpen ? setOpen(false) : null;
             }}
-            className={`flex items-center gap-3 rounded-md px-3 py-2 cursor-pointer transition-colors text-sm font-medium ${
+            className={`flex items-center gap-3 rounded-md px-3 py-2 cursor-pointer transition-colors text-sm font-medium border-l-4 ${
               isActive
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
             }`}
           >
             {menuItem.icon}

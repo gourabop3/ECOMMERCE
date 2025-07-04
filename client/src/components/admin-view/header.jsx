@@ -7,11 +7,13 @@ import { useDispatch } from "react-redux";
 import { logoutUser, resetTokenAndCredentials } from "@/store/auth-slice";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useState } from "react";
 
 function AdminHeader({ setOpen }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
+  const [searchTerm, setSearchTerm] = useState("");
 
   function handleLogout() {
     // dispatch(logoutUser());
@@ -37,6 +39,13 @@ function AdminHeader({ setOpen }) {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           placeholder="Search products…"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              navigate(`/admin/products?search=${encodeURIComponent(searchTerm)}`);
+            }
+          }}
           className="pl-9 pr-3 py-2 rounded-md"
         />
       </div>

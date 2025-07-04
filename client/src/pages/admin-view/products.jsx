@@ -18,6 +18,7 @@ import {
 } from "@/store/admin/products-slice";
 import { getAllOrdersForAdmin } from "@/store/admin/order-slice";
 import { brandOptionsMap, categoryOptionsMap } from "@/config";
+import { useSearchParams } from "react-router-dom";
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -45,6 +46,8 @@ function AdminProducts() {
   const { productList, isLoading } = useSelector((state) => state.adminProducts);
   const { orderList } = useSelector((state) => state.adminOrder);
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get("search") || "";
 
   async function handleImportFlipkart() {
     const url = window.prompt("Enter Flipkart product URL to import:");
@@ -140,6 +143,15 @@ function AdminProducts() {
 
   console.log(formData, "productList");
 
+  // Filter products based on search query (title or brand)
+  const filteredProducts = productList?.filter((prod) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      prod.title.toLowerCase().includes(query) ||
+      brandOptionsMap[prod.brand]?.toLowerCase().includes(query)
+    );
+  });
+
   // ===== Metrics calculations =====
   const totalProducts = productList?.length || 0;
   const totalOrders = orderList?.length || 0;
@@ -204,20 +216,20 @@ function AdminProducts() {
     <Fragment>
       {/* ===== Metrics ===== */}
       <div className="grid gap-4 sm:grid-cols-3 mb-6">
-        <Card>
-          <CardContent className="p-4 flex flex-col">
+        <Card className="shadow-md">
+          <CardContent className="p-4 flex flex-col gap-1">
             <span className="text-sm text-muted-foreground">Total Products</span>
             <span className="text-3xl font-extrabold">{totalProducts}</span>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4 flex flex-col">
+        <Card className="shadow-md">
+          <CardContent className="p-4 flex flex-col gap-1">
             <span className="text-sm text-muted-foreground">Total Orders</span>
             <span className="text-3xl font-extrabold">{totalOrders}</span>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4 flex flex-col">
+        <Card className="shadow-md">
+          <CardContent className="p-4 flex flex-col gap-1">
             <span className="text-sm text-muted-foreground">Revenue ($)</span>
             <span className="text-3xl font-extrabold">{totalRevenue.toFixed(2)}</span>
           </CardContent>
@@ -240,7 +252,7 @@ function AdminProducts() {
           ))}
         </div>
       ) : (
-        <AdminDataTable columns={columns} data={productList || []} />
+        <AdminDataTable columns={columns} data={filteredProducts || []} />
       )}
       <Sheet
         open={openCreateProductsDialog}

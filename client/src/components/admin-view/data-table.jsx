@@ -1,6 +1,6 @@
 function AdminDataTable({ columns = [], data = [] }) {
   return (
-    <div className="overflow-x-auto rounded-lg bg-background shadow-sm">
+    <div className="overflow-x-auto rounded-lg bg-background shadow-md">
       <table className="min-w-full divide-y divide-muted text-sm">
         <thead className="bg-muted/50">
           <tr>
@@ -26,7 +26,7 @@ function AdminDataTable({ columns = [], data = [] }) {
             </tr>
           ) : (
             data.map((row) => (
-              <tr key={row._id} className="hover:bg-muted/40">
+              <tr key={row._id} className="transition-colors hover:bg-muted/40">
                 {columns.map((col) => (
                   <td key={col.accessor} className="whitespace-nowrap px-3 py-2">
                     {col.Cell ? col.Cell(row) : row[col.accessor]}
