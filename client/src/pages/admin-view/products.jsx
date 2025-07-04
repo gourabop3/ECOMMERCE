@@ -42,7 +42,7 @@ function AdminProducts() {
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
 
-  const { productList } = useSelector((state) => state.adminProducts);
+  const { productList, isLoading } = useSelector((state) => state.adminProducts);
   const { orderList } = useSelector((state) => state.adminOrder);
   const dispatch = useDispatch();
 
@@ -232,8 +232,16 @@ function AdminProducts() {
           Import from Flipkart
         </Button>
       </div>
-      {/* ===== DataTable ===== */}
-      <AdminDataTable columns={columns} data={productList || []} />
+      {/* ===== DataTable or Loading ===== */}
+      {isLoading ? (
+        <div className="space-y-2">
+          {Array.from({ length: 5 }).map((_, idx) => (
+            <div key={idx} className="h-10 w-full bg-muted animate-pulse rounded" />
+          ))}
+        </div>
+      ) : (
+        <AdminDataTable columns={columns} data={productList || []} />
+      )}
       <Sheet
         open={openCreateProductsDialog}
         onOpenChange={() => {

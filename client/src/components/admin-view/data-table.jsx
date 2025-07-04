@@ -1,5 +1,3 @@
-import { Fragment } from "react";
-
 function AdminDataTable({ columns = [], data = [] }) {
   return (
     <div className="overflow-x-auto rounded-lg bg-background shadow-sm">
