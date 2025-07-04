@@ -20,6 +20,7 @@ import { getAllOrdersForAdmin } from "@/store/admin/order-slice";
 import { brandOptionsMap, categoryOptionsMap } from "@/config";
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { z } from "zod";
 
 const initialFormData = {
   image: null,
@@ -32,6 +33,17 @@ const initialFormData = {
   totalStock: "",
   averageReview: 0,
 };
+
+// ===== Validation Schema =====
+const productSchema = z.object({
+  title: z.string().min(2, "Title is required"),
+  description: z.string().min(5, "Description is required"),
+  category: z.string().nonempty("Category is required"),
+  brand: z.string().nonempty("Brand is required"),
+  price: z.preprocess((v) => Number(v), z.number().positive("Invalid price")),
+  salePrice: z.preprocess((v) => Number(v || 0), z.number().nonnegative()),
+  totalStock: z.preprocess((v) => Number(v), z.number().int().nonnegative("Invalid stock")),
+});
 
 function AdminProducts() {
   const [openCreateProductsDialog, setOpenCreateProductsDialog] =
@@ -83,6 +95,14 @@ function AdminProducts() {
 
   function onSubmit(event) {
     event.preventDefault();
+
+    // === Validation ===
+    const parsed = productSchema.safeParse(formData);
+    if (!parsed.success) {
+      const firstError = parsed.error.errors[0]?.message;
+      toast({ title: firstError || "Validation error", variant: "destructive" });
+      return;
+    }
 
     currentEditedId !== null
       ? dispatch(
