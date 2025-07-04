@@ -42,6 +42,40 @@ function AdminProducts() {
 
   const { productList } = useSelector((state) => state.adminProducts);
   const dispatch = useDispatch();
+
+  async function handleImportFlipkart() {
+    const url = window.prompt("Enter Flipkart product URL to import:");
+    if (!url) return;
+
+    try {
+      const res = await fetch("/api/admin/products/import-flipkart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url }),
+      });
+      const data = await res.json();
+      if (data?.success) {
+        toast({
+          title: "Product imported successfully",
+        });
+        dispatch(fetchAllProducts());
+      } else {
+        toast({
+          title: data?.message || "Failed to import product",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error importing product",
+        variant: "destructive",
+      });
+    }
+  }
+
   const { toast } = useToast();
 
   function onSubmit(event) {
@@ -104,9 +138,12 @@ function AdminProducts() {
 
   return (
     <Fragment>
-      <div className="mb-5 w-full flex justify-end">
+      <div className="mb-5 w-full flex flex-col md:flex-row gap-3 justify-end">
         <Button onClick={() => setOpenCreateProductsDialog(true)}>
           Add New Product
+        </Button>
+        <Button variant="outline" onClick={handleImportFlipkart}>
+          Import from Flipkart
         </Button>
       </div>
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
