@@ -14,6 +14,7 @@ import {
   Plug,
   Camera,
   Apple,
+  Circle,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -90,6 +91,10 @@ function ShoppingHome() {
     });
   }
 
+  function goToSlide(index) {
+    setCurrentSlide(index);
+  }
+
   useEffect(() => {
     if (productDetails !== null) setOpenDetailsDialog(true);
   }, [productDetails]);
@@ -131,8 +136,11 @@ function ShoppingHome() {
               />
             ))
           : null}
+        {/* gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
+        {/* controls */}
         <Button
-          variant="outline"
+          variant="secondary"
           size="icon"
           onClick={() =>
             setCurrentSlide(
@@ -141,22 +149,34 @@ function ShoppingHome() {
                 featureImageList.length
             )
           }
-          className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white/80"
+          className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white/90 hover:bg-white"
         >
-          <ChevronLeftIcon className="w-4 h-4" />
+          <ChevronLeftIcon className="w-5 h-5 text-foreground" />
         </Button>
         <Button
-          variant="outline"
+          variant="secondary"
           size="icon"
           onClick={() =>
-            setCurrentSlide(
-              (prevSlide) => (prevSlide + 1) % featureImageList.length
-            )
+            setCurrentSlide((prevSlide) => (prevSlide + 1) % featureImageList.length)
           }
-          className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white/80"
+          className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white/90 hover:bg-white"
         >
-          <ChevronRightIcon className="w-4 h-4" />
+          <ChevronRightIcon className="w-5 h-5 text-foreground" />
         </Button>
+        {/* bullet indicators */}
+        {featureImageList && featureImageList.length > 0 && (
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-6 flex gap-3">
+            {featureImageList.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => goToSlide(idx)}
+                className={`h-2.5 w-2.5 rounded-full transition-colors ${
+                  idx === currentSlide ? "bg-white" : "bg-white/50"
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
