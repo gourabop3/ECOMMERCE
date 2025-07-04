@@ -65,12 +65,16 @@ function ShoppingOrders() {
                     <TableCell>{orderItem?.orderDate.split("T")[0]}</TableCell>
                     <TableCell>
                       <Badge
-                        className={`py-1 px-3 ${
-                          orderItem?.orderStatus === "confirmed"
+                        className={`py-1 px-3 capitalize ${
+                          orderItem?.orderStatus === "delivered"
                             ? "bg-green-500"
                             : orderItem?.orderStatus === "rejected"
                             ? "bg-red-600"
-                            : "bg-black"
+                            : orderItem?.orderStatus === "inShipping"
+                            ? "bg-blue-500"
+                            : orderItem?.orderStatus === "inProcess"
+                            ? "bg-yellow-500"
+                            : "bg-muted-foreground"
                         }`}
                       >
                         {orderItem?.orderStatus}
@@ -90,7 +94,7 @@ function ShoppingOrders() {
                             handleFetchOrderDetails(orderItem?._id)
                           }
                         >
-                          View Details
+                          Track
                         </Button>
                         <ShoppingOrderDetailsView orderDetails={orderDetails} />
                       </Dialog>

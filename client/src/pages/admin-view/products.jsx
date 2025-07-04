@@ -21,6 +21,7 @@ import { brandOptionsMap, categoryOptionsMap } from "@/config";
 import { useSearchParams } from "react-router-dom";
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Loader2 } from "lucide-react";
 
 const initialFormData = {
   image: null,
@@ -42,6 +43,7 @@ function AdminProducts() {
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const [imageLoadingState, setImageLoadingState] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
+  const [deleteLoadingId, setDeleteLoadingId] = useState(null);
 
   const { productList, isLoading } = useSelector((state) => state.adminProducts);
   const { orderList } = useSelector((state) => state.adminOrder);
@@ -122,10 +124,12 @@ function AdminProducts() {
   }
 
   function handleDelete(getCurrentProductId) {
+    setDeleteLoadingId(getCurrentProductId);
     dispatch(deleteProduct(getCurrentProductId)).then((data) => {
       if (data?.payload?.success) {
         dispatch(fetchAllProducts());
       }
+      setDeleteLoadingId(null);
     });
   }
 
@@ -204,8 +208,17 @@ function AdminProducts() {
           >
             Edit
           </Button>
-          <Button variant="destructive" size="sm" onClick={() => handleDelete(row._id)}>
-            Delete
+          <Button
+            variant="destructive"
+            size="sm"
+            disabled={deleteLoadingId === row._id}
+            onClick={() => handleDelete(row._id)}
+          >
+            {deleteLoadingId === row._id ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              "Delete"
+            )}
           </Button>
         </div>
       ),
@@ -216,19 +229,19 @@ function AdminProducts() {
     <Fragment>
       {/* ===== Metrics ===== */}
       <div className="grid gap-4 sm:grid-cols-3 mb-6">
-        <Card className="shadow-md">
+        <Card className="shadow-md transition-transform hover:-translate-y-1 hover:shadow-lg">
           <CardContent className="p-4 flex flex-col gap-1">
             <span className="text-sm text-muted-foreground">Total Products</span>
             <span className="text-3xl font-extrabold">{totalProducts}</span>
           </CardContent>
         </Card>
-        <Card className="shadow-md">
+        <Card className="shadow-md transition-transform hover:-translate-y-1 hover:shadow-lg">
           <CardContent className="p-4 flex flex-col gap-1">
             <span className="text-sm text-muted-foreground">Total Orders</span>
             <span className="text-3xl font-extrabold">{totalOrders}</span>
           </CardContent>
         </Card>
-        <Card className="shadow-md">
+        <Card className="shadow-md transition-transform hover:-translate-y-1 hover:shadow-lg">
           <CardContent className="p-4 flex flex-col gap-1">
             <span className="text-sm text-muted-foreground">Revenue ($)</span>
             <span className="text-3xl font-extrabold">{totalRevenue.toFixed(2)}</span>
