@@ -9,13 +9,13 @@ function ShoppingProductTile({
   handleAddtoCart,
 }) {
   return (
-    <Card className="w-full max-w-sm mx-auto group overflow-hidden">
+    <Card className="w-full max-w-xs md:max-w-sm mx-auto group overflow-hidden border border-muted hover:shadow-lg hover:-translate-y-1 transition-all bg-white">
       <div className="relative">
         <img
           onClick={() => handleGetProductDetails(product?._id)}
           src={product?.image}
           alt={product?.title}
-          className="w-full h-[260px] object-cover transition-transform duration-200 group-hover:scale-105"
+          className="w-full h-[260px] object-cover transition-transform duration-300 group-hover:scale-110"
         />
 
         {/* STOCK / SALE BADGES */}
@@ -41,23 +41,23 @@ function ShoppingProductTile({
         {product?.totalStock > 0 && (
           <button
             onClick={() => handleAddtoCart(product?._id, product?.totalStock)}
-            className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-200 bg-primary text-white py-2 text-sm font-bold"
+            className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-primary text-primary-foreground py-2 text-sm font-semibold tracking-wide"
           >
-            Add to cart
+            Add to Cart
           </button>
         )}
       </div>
 
-      <CardContent className="p-4">
+      <CardContent className="p-4 space-y-1.5">
         <h2
           onClick={() => handleGetProductDetails(product?._id)}
-          className="text-base font-semibold leading-6 h-12 overflow-hidden text-ellipsis mb-2 cursor-pointer"
+          className="text-base font-semibold leading-6 h-12 overflow-hidden text-ellipsis cursor-pointer hover:text-primary"
         >
           {product?.title}
         </h2>
 
         {/* Rating */}
-        <div className="flex items-center gap-1 mb-2">
+        <div className="flex items-center gap-0.5 mb-2">
           {Array.from({ length: 5 }).map((_, idx) => (
             <Star
               key={idx}
@@ -70,7 +70,7 @@ function ShoppingProductTile({
           ))}
         </div>
 
-        <div className="flex justify-between items-center mb-2 text-sm text-muted-foreground">
+        <div className="flex justify-between items-center text-xs text-muted-foreground">
           <span>{categoryOptionsMap[product?.category]}</span>
           <span>{brandOptionsMap[product?.brand]}</span>
         </div>
@@ -84,7 +84,7 @@ function ShoppingProductTile({
             ${product?.price}
           </span>
           {product?.salePrice > 0 && (
-            <span className="text-lg font-bold text-primary">
+            <span className="text-lg font-bold text-destructive">
               ${product?.salePrice}
             </span>
           )}
