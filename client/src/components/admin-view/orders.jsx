@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Dialog } from "../ui/dialog";
 import { Badge } from "../ui/badge";
@@ -13,6 +14,7 @@ import AdminOrderDetailsView from "./order-details";
 
 function AdminOrdersView() {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("all");
   const { orderList } = useSelector((state) => state.adminOrder);
   const dispatch = useDispatch();
 
@@ -24,16 +26,37 @@ function AdminOrdersView() {
     setSelectedOrderId(orderId);
   }
 
+  // ===== Filtered Orders =====
+  const filteredOrders = orderList?.filter((o) =>
+    statusFilter === "all" ? true : o.orderStatus === statusFilter
+  );
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>All Orders</CardTitle>
+      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <CardTitle>Orders</CardTitle>
+        <div className="w-44">
+          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="inProcess">In Process</SelectItem>
+              <SelectItem value="inShipping">In Shipping</SelectItem>
+              <SelectItem value="delivered">Delivered</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
+              <SelectItem value="confirmed">Confirmed</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
 
         {/* ✅ Mobile View */}
         <div className="block md:hidden space-y-4">
-          {orderList?.map((orderItem) => (
+          {filteredOrders?.map((orderItem) => (
             <div key={orderItem._id} className="border p-4 rounded text-sm shadow-sm">
               <div><strong>Order ID:</strong> <span className="break-all">{orderItem._id}</span></div>
               <div><strong>Date:</strong> {orderItem.orderDate?.split("T")[0]}</div>
@@ -72,7 +95,7 @@ function AdminOrdersView() {
               </tr>
             </thead>
             <tbody>
-              {orderList?.map((orderItem) => (
+              {filteredOrders?.map((orderItem) => (
                 <tr key={orderItem._id} className="border-b">
                   <td className="px-3 py-2 max-w-[160px] truncate">{orderItem._id}</td>
                   <td className="px-3 py-2">{orderItem.orderDate?.split("T")[0]}</td>
